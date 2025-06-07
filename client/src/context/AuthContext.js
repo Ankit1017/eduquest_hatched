@@ -10,12 +10,14 @@ export const AuthProvider = ({ children }) => {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const [appUser, setAppUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
   useEffect(() => {
     console.log(user)
     const syncUser = async () => {
       if (user && isLoaded) {
+        setLoading(true);
         const role = 'user'; // define or extract user role
         const classList = []; // your logic here
 
@@ -43,7 +45,11 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('user', JSON.stringify(response.data));
         } catch (err) {
           console.error('Sync failed:', err);
+        } finally {
+          setLoading(false); // DONE loading
         }
+      } else {
+        setLoading(false);
       }
     };
 
@@ -67,7 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user: appUser, login, logout }}>
+    <AuthContext.Provider value={{ user: appUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

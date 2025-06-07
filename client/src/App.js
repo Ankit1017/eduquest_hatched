@@ -27,7 +27,12 @@ const NotFound = () => (
 );
 
 const App = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <div>Loading ...</div>
+  }
+
   return (
     <ClassProvider>
       <Routes>
@@ -38,7 +43,7 @@ const App = () => {
               <Route path='/add-question' element={<QuestionForm />} />
               <Route path='/question-paper' element={<QuestionPaperPage />} />
               <Route path='/admin' element={<AdminPanel />} />
-              {/* <Route path="/join/:enrollmentCode" element={<ClassJoinPage />} /> */}
+              {/* <Route path="/join/:class-id" element={<ClassJoinPage />} /> */}
               <Route path="/class" element={<ClassManager />} />
               <Route path='*' element={<NotFound />} />
             </>

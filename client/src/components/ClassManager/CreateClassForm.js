@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { useClass } from '../../context/ClassContext';
-import { Button, TextField, Grid, Paper, Typography, Box, Alert } from '@mui/material';
+import { Button, TextField, Grid, Paper, Typography, Box, Alert, Modal, Snackbar } from '@mui/material';
+
 import { AuthContext } from '../../context/AuthContext';
 
 const darkTheme = {
@@ -23,7 +24,7 @@ const CreateClassForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    subject: 'math',
+    subject: '',
     enrollmentCode: '',
     schedule: { days: [], time: '' },
     classId: generateRandomId(),
@@ -31,23 +32,44 @@ const CreateClassForm = () => {
     status: 'active'
   });
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      subject: '',
+      enrollmentCode: '',
+      schedule: { days: [], time: '' },
+      classId: generateRandomId(),
+      user: user,
+      status: 'active'
+    })
+  }
+
   const [createdStatus, setCreatedStatus] = useState(null);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [classLink, setClassLink] = useState('');
+  const [copied, setCopied] = useState(false);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
+
     try {
       const createdClass = await createClass(formData);
+      setClassLink(formData.classId);
       setCreatedStatus(createdClass.status || 'active');
       setFormData({
         name: '',
         description: '',
-        subject: 'math',
+        subject: '',
         enrollmentCode: '',
         schedule: { days: [], time: '' },
         classId: generateRandomId(),
         user: user,
         status: 'active'
       });
+      setLinkModalOpen(true);
     } catch (error) {
       setCreatedStatus('error');
       console.error(error);
@@ -136,6 +158,65 @@ const CreateClassForm = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                label="Subject"
+                value={formData.subject}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: darkTheme.background,
+                    color: darkTheme.textPrimary,
+                    '& fieldset': {
+                      borderColor: darkTheme.accent
+                    },
+                    '&:hover fieldset': {
+                      borderColor: darkTheme.textSecondary
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: darkTheme.accent
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: darkTheme.textSecondary,
+                    '&.Mui-focused': {
+                      color: darkTheme.accent
+                    }
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: darkTheme.background,
+                    color: darkTheme.textPrimary,
+                    '& fieldset': {
+                      borderColor: darkTheme.accent
+                    },
+                    '&:hover fieldset': {
+                      borderColor: darkTheme.textSecondary
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: darkTheme.accent
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: darkTheme.textSecondary,
+                    '&.Mui-focused': {
+                      color: darkTheme.accent
+                    }
+                  }
+                }}
+              />
+            </Grid>
+            {/* <Grid item xs={12}>
+              <TextField
+                fullWidth
                 label="Enrollment Code"
                 value={formData.enrollmentCode}
                 onChange={(e) => setFormData({ ...formData, enrollmentCode: e.target.value })}
@@ -162,7 +243,7 @@ const CreateClassForm = () => {
                   }
                 }}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -187,6 +268,75 @@ const CreateClassForm = () => {
             </Grid>
           </Grid>
         </form>
+        <Modal open={linkModalOpen} onClose={() => {
+          setLinkModalOpen(false)
+          setClassLink('');
+          resetForm();
+        }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              bgcolor: darkTheme.cardBackground,
+              border: `2px solid ${darkTheme.accent}`,
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 4,
+              color: darkTheme.textPrimary,
+              minWidth: 300,
+              maxWidth: 400
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Share Class Link
+            </Typography>
+
+            <Typography sx={{ mb: 2, wordBreak: 'break-all' }}>
+              Class Code: {classLink}
+            </Typography>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{ mb: 2 }}
+              onClick={() => {
+                navigator.clipboard.writeText(classLink);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+
+            >
+              Copy Joining Code
+            </Button>
+
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={() => {
+                setLinkModalOpen(false)
+                setClassLink('');
+                resetForm();
+              }}
+              sx={{
+                background: darkTheme.accent,
+                '&:hover': {
+                  background: '#1976d2'
+                }
+              }}
+            >
+              Close
+            </Button>
+          </Box>
+        </Modal>
+        {copied && (
+          <Snackbar open={copied} autoHideDuration={2000}>
+            <Alert severity="success">Link copied!</Alert>
+          </Snackbar>
+        )}
+
+
       </Paper>
     </Box>
   );
