@@ -1,5 +1,5 @@
 // src/context/ClassContext.js
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '@clerk/clerk-react';
 import { host } from '../config';
@@ -11,20 +11,24 @@ export const ClassProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchClasses = async () => {
-    try {
-      setLoading(true);
-      const token = await getToken();
-      const response = await axios.get(`${host}/api/classes`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setClasses(response.data);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch classes');
-    } finally {
-      setLoading(false);
-    }
-  };
+// In your useClass context (where fetchClasses is defined), ensure it's memoized:
+const fetchClasses = useCallback(async (userId) => {
+  try {
+    setLoading(true);
+    const token = await getToken();
+    const response = await axios.get(`${host}/api/classes/my`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { user: userId }
+    });
+    setClasses(response.data.classes || []);
+  } catch (err) {
+    setError(err.response?.data?.error || 'Failed to fetch classes');
+  } finally {
+    setLoading(false);
+  }
+}, [getToken]); // Add all dependencies used in the callback
+
+
 
   const createClass = async (classData) => {
     try {

@@ -1,4 +1,3 @@
-// PerformanceAnalysisManager/usePerformanceAnalysis.js
 import { useState } from 'react';
 
 export const usePerformanceAnalysis = (performance) => {

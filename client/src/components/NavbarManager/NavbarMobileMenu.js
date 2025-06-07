@@ -1,24 +1,47 @@
 // NavbarMobileMenu.jsx
-// Mobile menu overlay with links and user info
+// Modern mobile menu with smooth animations
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './NavbarStyles';
 import NavbarLinks from './NavbarLinks';
 import NavbarUserBox from './NavbarUserBox';
+import { Logout } from '../AuthManager';
 
-/**
- * NavbarMobileMenu
- * @param {Array} links - Navigation links
- * @param {string} username - Current username
- * @param {function} onClose - Function to close the menu
- */
-const NavbarMobileMenu = ({ links, username, onClose }) => (
-  <div style={styles.mobileMenu} onClick={onClose}>
-    <NavbarLinks links={links} onClick={onClose} />
-    <div style={styles.mobileUserBox}>
-      <NavbarUserBox username={username} />
+const NavbarMobileMenu = ({ isOpen, links, username, onClose }) => {
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  return (
+    <div
+      style={styles.mobileMenu(isOpen)}
+      onClick={onClose}
+    >
+      <div onClick={(e) => e.stopPropagation()}>
+        <NavbarLinks
+          links={links}
+          isMobile={true}
+          onClick={onClose}
+        />
+
+        <div style={styles.mobileUserBox}>
+          <NavbarUserBox username={username} isMobile={true} />
+          <div style={{ marginTop: '16px' }}>
+            <Logout />
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default NavbarMobileMenu;

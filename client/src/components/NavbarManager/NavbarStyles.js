@@ -1,108 +1,252 @@
 // NavbarStyles.js
-// Centralized, overridable style objects for Navbar
+// Modern dark navbar with glassmorphism and scroll effects
 
 export const styles = {
-  nav: {
-    position: 'sticky',
+  nav: (isScrolled) => ({
+    position: 'fixed',
     top: 0,
-    zIndex: 999,
-    background: 'linear-gradient(90deg, #0f1116 60%, #191c22 100%)',
-    color: '#fff',
-    padding: '0 32px',
-    boxShadow: '0 2px 16px 0 rgba(0,0,0,0.16)',
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    background: isScrolled
+      ? 'rgba(10, 25, 41, 0.85)'
+      : 'rgba(10, 25, 41, 0.95)',
+    backdropFilter: 'blur(20px)',
+    borderBottom: isScrolled
+      ? '1px solid rgba(100, 181, 246, 0.2)'
+      : '1px solid rgba(255, 255, 255, 0.1)',
+    color: '#e3f2fd',
+    padding: '0 clamp(20px, 5vw, 40px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 64,
-    transition: 'background 0.3s cubic-bezier(.4,0,.2,1)'
-  },
+    height: 72,
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: isScrolled
+      ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+      : '0 2px 16px rgba(0, 0, 0, 0.1)',
+  }),
+
+
   logo: {
     display: 'flex',
     alignItems: 'center',
-    fontWeight: 700,
-    fontSize: '1.4rem',
+    fontWeight: 800,
+    fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)',
     color: '#fff',
     textDecoration: 'none',
-    gap: '12px',
-    letterSpacing: '0.02em'
+    gap: '14px',
+    letterSpacing: '-0.02em',
+    position: 'relative',
+    transition: 'transform 0.2s ease',
+    '&:hover': {
+      transform: 'scale(1.02)'
+    }
   },
+
+  logoIcon: {
+    fontSize: '2em',
+    background: 'linear-gradient(135deg, #64b5f6 0%, #90caf9 50%, #bbdefb 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    filter: 'drop-shadow(0 2px 4px rgba(100, 181, 246, 0.3))',
+  },
+
+  logoText: {
+    background: 'linear-gradient(135deg, #fff 0%, #e3f2fd 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+  },
+
+  navContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+    flex: 1,
+    justifyContent: 'center',
+  },
+
   navLinks: {
     display: 'flex',
     alignItems: 'center',
-    gap: '22px'
+    gap: '8px',
+    background: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: '16px',
+    padding: '8px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
   },
+
   navLink: (active) => ({
-    color: active ? '#fff' : '#b0b6c1',
+    color: active ? '#fff' : '#b3c5d7',
     textDecoration: 'none',
-    fontWeight: active ? 700 : 500,
-    fontSize: '1.08rem',
-    padding: '7px 16px',
-    borderRadius: '8px',
-    background: active ? 'rgba(255,255,255,0.09)' : 'none',
-    transition: 'background 0.2s, color 0.2s',
+    fontWeight: active ? 600 : 500,
+    fontSize: '0.95rem',
+    padding: '10px 20px',
+    borderRadius: '12px',
+    background: active
+      ? 'linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(144, 202, 249, 0.1) 100%)'
+      : 'transparent',
+    border: active ? '1px solid rgba(100, 181, 246, 0.3)' : '1px solid transparent',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     position: 'relative',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    letterSpacing: '0.02em',
+    '&:hover': {
+      color: '#fff',
+      background: active
+        ? 'linear-gradient(135deg, rgba(100, 181, 246, 0.3) 0%, rgba(144, 202, 249, 0.2) 100%)'
+        : 'rgba(255, 255, 255, 0.08)',
+      transform: 'translateY(-1px)',
+      boxShadow: '0 4px 12px rgba(100, 181, 246, 0.2)',
+    }
   }),
-  navLinkUnderline: (active) => ({
+
+  navLinkIndicator: (active) => ({
     position: 'absolute',
-    left: 8,
-    right: 8,
-    bottom: 4,
-    height: 2,
-    borderRadius: 2,
-    background: active ? 'linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%)' : 'transparent',
-    opacity: active ? 1 : 0,
-    transition: 'opacity 0.2s'
+    bottom: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: active ? '80%' : '0%',
+    height: '2px',
+    background: 'linear-gradient(90deg, #64b5f6 0%, #90caf9 100%)',
+    borderRadius: '2px',
+    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   }),
+
+  userSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+
   userBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: '18px',
-    marginLeft: '32px',
-    background: 'rgba(255,255,255,0.04)',
-    borderRadius: '8px',
-    padding: '6px 18px',
+    gap: '12px',
+    background: 'rgba(255, 255, 255, 0.06)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '12px',
+    padding: '8px 16px',
     fontWeight: 600,
-    fontSize: '1.08em',
-    letterSpacing: 0.3
+    fontSize: '0.9rem',
+    letterSpacing: '0.02em',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: '1px solid rgba(100, 181, 246, 0.3)',
+    }
   },
-  hamburger: {
+
+  userAvatar: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #64b5f6 0%, #90caf9 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    fontWeight: 700,
+    fontSize: '0.8rem',
+    boxShadow: '0 2px 8px rgba(100, 181, 246, 0.3)',
+  },
+
+  hamburger: (isOpen) => ({
     display: 'none',
     flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
     cursor: 'pointer',
-    marginLeft: 18,
-    zIndex: 1100
-  },
-  bar: {
-    width: '28px',
-    height: '3px',
+    padding: '8px',
+    borderRadius: '8px',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      background: 'rgba(255, 255, 255, 0.1)',
+    }
+  }),
+
+  hamburgerBar: (isOpen, index) => ({
+    width: '24px',
+    height: '2px',
     background: '#fff',
-    margin: '4px 0',
     borderRadius: '2px',
-    transition: 'all 0.3s cubic-bezier(.4,0,.2,1)'
-  },
-  mobileMenu: {
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    transformOrigin: 'center',
+    margin: '3px 0',
+    ...(isOpen && index === 0 && {
+      transform: 'rotate(45deg) translate(6px, 6px)',
+    }),
+    ...(isOpen && index === 1 && {
+      opacity: 0,
+    }),
+    ...(isOpen && index === 2 && {
+      transform: 'rotate(-45deg) translate(6px, -6px)',
+    }),
+  }),
+
+  mobileMenu: (isOpen) => ({
     position: 'fixed',
     top: 0,
     left: 0,
     width: '100vw',
     height: '100vh',
-    background: 'rgba(17,19,26,0.96)',
-    boxShadow: '0 6px 24px rgba(25,118,210,0.13)',
-    padding: '80px 0 16px 0',
+    background: 'rgba(10, 25, 41, 0.98)',
+    backdropFilter: 'blur(20px)',
+    padding: '100px 32px 32px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '22px',
-    zIndex: 1200,
-    opacity: 1,
-    animation: 'fadeIn 0.25s'
-  },
-  mobileUserBox: {
+    gap: '24px',
+    zIndex: 999,
+    opacity: isOpen ? 1 : 0,
+    visibility: isOpen ? 'visible' : 'hidden',
+    transform: isOpen ? 'translateY(0)' : 'translateY(-20px)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  }),
+
+  mobileNavLinks: {
     display: 'flex',
-    alignItems: 'center',
-    gap: '14px',
-    margin: '18px 0 0 18px'
+    flexDirection: 'column',
+    gap: '16px',
+    marginBottom: '32px',
+  },
+
+  mobileNavLink: (active) => ({
+    color: active ? '#fff' : '#b3c5d7',
+    textDecoration: 'none',
+    fontWeight: active ? 600 : 500,
+    fontSize: '1.1rem',
+    padding: '16px 24px',
+    borderRadius: '12px',
+    background: active
+      ? 'linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(144, 202, 249, 0.1) 100%)'
+      : 'rgba(255, 255, 255, 0.05)',
+    border: active ? '1px solid rgba(100, 181, 246, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
+    letterSpacing: '0.02em',
+  }),
+
+  mobileUserBox: {
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '12px',
+    padding: '20px',
+    marginTop: 'auto',
+  },
+
+  // Responsive breakpoints
+  '@media (max-width: 900px)': {
+    hamburger: {
+      display: 'flex'
+    },
+    navLinks: {
+      display: 'none'
+    },
+    userBox: {
+      display: 'none'
+    }
   }
 };
 

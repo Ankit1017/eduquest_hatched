@@ -266,12 +266,14 @@ router.get('/search', async (req, res) => {
 // 11. List All Classes a Student is Enrolled In
 router.get('/my', async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate('classList');
-    res.json(user.classList);
+    const userId = req.query.user; // Get user ID from query parameters
+    const user = await User.findById(userId).populate('classList');
+    res.json({ classes: user.classList });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch your classes' });
   }
 });
+
 
 // 12. List All Classes Created by a Teacher
 router.get('/created', async (req, res) => {
