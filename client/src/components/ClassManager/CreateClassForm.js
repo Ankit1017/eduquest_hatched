@@ -3,6 +3,7 @@ import { useClass } from '../../context/ClassContext';
 import { Button, TextField, Grid, Paper, Typography, Box, Alert, Modal, Snackbar } from '@mui/material';
 
 import { AuthContext } from '../../context/AuthContext';
+import {current_host} from "../../config";
 
 const darkTheme = {
   background: '#0a1929',
@@ -21,11 +22,18 @@ const CreateClassForm = () => {
     return Math.random().toString(36).substr(2, length);
   };
 
+  const generateEnrollmentCode = (length = 8) => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return Array.from({ length }, () =>
+        chars.charAt(Math.floor(Math.random() * chars.length))
+      ).join('');
+    };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     subject: '',
-    enrollmentCode: '',
+    enrollmentCode: generateEnrollmentCode(),
     schedule: { days: [], time: '' },
     classId: generateRandomId(),
     user: user,
@@ -57,7 +65,7 @@ const CreateClassForm = () => {
 
     try {
       const createdClass = await createClass(formData);
-      setClassLink(formData.classId);
+      setClassLink(`${current_host}join/${formData.classId}`);
       setCreatedStatus(createdClass.status || 'active');
       setFormData({
         name: '',
@@ -294,7 +302,7 @@ const CreateClassForm = () => {
             </Typography>
 
             <Typography sx={{ mb: 2, wordBreak: 'break-all' }}>
-              Class Code: {classLink}
+              Class link: {classLink}
             </Typography>
 
             <Button

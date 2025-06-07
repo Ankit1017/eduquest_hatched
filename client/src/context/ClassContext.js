@@ -40,11 +40,10 @@ export const ClassProvider = ({ children }) => {
     }
   };
 
-  const joinClass = async (classId, enrollmentCode,user) => {
+  const joinClass = async (classId,user) => {
     try {
       const token = await getToken();
       const data= {
-        "enrollmentCode":enrollmentCode,
         "user":user
       }
       const response = await axios.post(`${host}/api/classes/${classId}/join`,

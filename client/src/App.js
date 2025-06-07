@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { useContext } from 'react';
+import {Routes, Route } from "react-router-dom";
 import Home from './pages/Home';
 import AdminPanel from './pages/AdminPanel';
 import { QuestionForm } from './components/QuestionFormManager';
@@ -8,10 +8,10 @@ import SyncUser from "./components/SyncUser";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { AuthContext } from './context/AuthContext';
-// import ClassJoinPage from "./pages/ClassJoinPage";
 import { ClassProvider } from './context/ClassContext';
 import ClassManager from "./components/ClassManager/ClassManager";
-// Optional: Simple NotFound component for unmatched routes
+import JoinClassPage from './pages/JoinClassPage'; // <-- Import your new page
+
 const NotFound = () => (
   <div style={{
     minHeight: '60vh',
@@ -39,17 +39,18 @@ const App = () => {
         {
           user ? (
             <>
-              <Route path='/home' element={<Home />} />
+              <Route path='/' element={<Home />} />
               <Route path='/add-question' element={<QuestionForm />} />
               <Route path='/question-paper' element={<QuestionPaperPage />} />
               <Route path='/admin' element={<AdminPanel />} />
-              {/* <Route path="/join/:class-id" element={<ClassJoinPage />} /> */}
               <Route path="/class" element={<ClassManager />} />
+              <Route path="/join/:classId" element={<JoinClassPage />} /> {/* <-- Add this */}
               <Route path='*' element={<NotFound />} />
             </>
           ) :
             (
               <>
+                {/* If not logged in, redirect all to SyncUser */}
                 <Route path='*' element={<SyncUser />} />
               </>
             )

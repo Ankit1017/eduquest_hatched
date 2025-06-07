@@ -128,15 +128,11 @@ router.post(
   requireRole('student'),
   async (req, res) => {
     try {
-      const { enrollmentCode } = req.body.data;
       console.log("hvjhv")
       const student = await User.findById(req.body.data.user._id);
       const targetClass = await Class.findOne({ classId: req.params.classId });
       console.log("hvjhv")
       if (!targetClass) return res.status(404).json({ error: 'Class not found' });
-      if (targetClass.enrollmentCode !== enrollmentCode) {
-        return res.status(400).json({ error: 'Invalid enrollment code' });
-      }
       console.log("hvjhv")
       if (targetClass.userList.includes(student._id)) {
         return res.status(400).json({ error: 'Already enrolled' });

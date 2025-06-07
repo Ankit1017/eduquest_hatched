@@ -35,7 +35,7 @@ const Navbar = () => {
     { to: '/question-paper', label: 'Question Paper', show: true },
     { to: '/add-question', label: 'Add Question', show: user.role !== 'student' },
     { to: '/admin', label: 'Admin', show: user.role !== 'student' },
-    { to: '/class', label: 'Class' ,show: true },
+    { to: '/class', label: 'Class' ,show: user.role !== 'student' },
   ];
 
   return (

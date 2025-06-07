@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     setAppUser(data);
     localStorage.setItem('user', JSON.stringify(data));
-    navigate('/home')
+    // navigate('/home')
   };
 
   const logout = async () => {
