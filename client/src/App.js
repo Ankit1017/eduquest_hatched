@@ -27,7 +27,12 @@ const NotFound = () => (
 );
 
 const App = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <div>Loading ...</div>
+  }
+
   return (
     <ClassProvider>
       <Routes>
