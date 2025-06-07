@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import axios from 'axios';
 import { host } from '../config';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 

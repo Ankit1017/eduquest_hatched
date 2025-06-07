@@ -4,8 +4,8 @@
 export const styles = {
   container: {
     marginTop: '32px',
-    padding: '0 24px',
-    color: '#f0f0f0'
+    padding: '24px 24px',
+    color: '#f0f0f0',
   },
   card: {
     background: 'linear-gradient(145deg, #1a1d24, #23272f)',
@@ -41,18 +41,18 @@ export const styles = {
     background: isCorrect
       ? 'rgba(76,175,80,0.15)'
       : isSelected
-      ? 'rgba(255,183,77,0.15)'
-      : 'rgba(255,255,255,0.05)',
+        ? 'rgba(255,183,77,0.15)'
+        : 'rgba(255,255,255,0.05)',
     color: isCorrect
       ? '#4caf50'
       : isSelected
-      ? '#ffb74d'
-      : '#e0e0e0',
+        ? '#ffb74d'
+        : '#e0e0e0',
     border: isCorrect
       ? '1px solid rgba(76,175,80,0.4)'
       : isSelected
-      ? '1px solid rgba(255,183,77,0.4)'
-      : '1px solid rgba(255,255,255,0.1)',
+        ? '1px solid rgba(255,183,77,0.4)'
+        : '1px solid rgba(255,255,255,0.1)',
     margin: '8px 0',
     fontWeight: isCorrect || isSelected ? 600 : 400,
     display: 'flex',

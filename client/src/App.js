@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './pages/Home';
 import AdminPanel from './pages/AdminPanel';
-import {QuestionForm} from './components/QuestionFormManager';
+import { QuestionForm } from './components/QuestionFormManager';
 import QuestionPaperPage from './components/QuestionPaper';
 import SyncUser from "./components/SyncUser";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import AuthProvider from './context/AuthContext';
-import ClassJoinPage from "./pages/ClassJoinPage";
+import { AuthContext } from './context/AuthContext';
+// import ClassJoinPage from "./pages/ClassJoinPage";
 import { ClassProvider } from './context/ClassContext';
 import ClassManager from "./components/ClassManager/ClassManager";
 // Optional: Simple NotFound component for unmatched routes
@@ -27,23 +27,30 @@ const NotFound = () => (
 );
 
 const App = () => {
+  const { user } = useContext(AuthContext);
   return (
-    <BrowserRouter>
-      <AuthProvider>
-      <ClassProvider>
+    <ClassProvider>
       <Routes>
-        <Route path='/' element={<SyncUser />}/>
-        <Route path='/home' element={<Home />} />
-        <Route path='/add-question' element={<QuestionForm />} />
-        <Route path='/question-paper' element={<QuestionPaperPage />} />
-        <Route path='/admin' element={<AdminPanel />} />
-        <Route path="/join/:enrollmentCode" element={<ClassJoinPage />} />
-        <Route path="/class" element={<ClassManager/>}/>
-        <Route path='*' element={<NotFound />} />
+        {
+          user ? (
+            <>
+              <Route path='/home' element={<Home />} />
+              <Route path='/add-question' element={<QuestionForm />} />
+              <Route path='/question-paper' element={<QuestionPaperPage />} />
+              <Route path='/admin' element={<AdminPanel />} />
+              {/* <Route path="/join/:enrollmentCode" element={<ClassJoinPage />} /> */}
+              <Route path="/class" element={<ClassManager />} />
+              <Route path='*' element={<NotFound />} />
+            </>
+          ) :
+            (
+              <>
+                <Route path='*' element={<SyncUser />} />
+              </>
+            )
+        }
       </Routes>
-      </ClassProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    </ClassProvider>
   );
 };
 
