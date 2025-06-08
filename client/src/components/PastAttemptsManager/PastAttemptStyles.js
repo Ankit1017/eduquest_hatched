@@ -7,6 +7,12 @@ export const styles = {
     padding: '24px 24px',
     color: '#f0f0f0',
   },
+  homePageContainer: {
+    padding: '20px 24px',
+    color: '#f0f0f0',
+    minHeight: '95vh',
+    overflow: 'hidden',
+  },
   card: {
     background: 'linear-gradient(145deg, #1a1d24, #23272f)',
     borderRadius: '14px',

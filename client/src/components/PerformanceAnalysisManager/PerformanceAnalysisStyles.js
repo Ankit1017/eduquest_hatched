@@ -4,6 +4,12 @@ export const styles = {
     position: 'relative',
     marginBottom: '32px'
   },
+  homePageContainer: {
+    padding: '0px 24px',
+    color: '#f0f0f0',
+    minHeight: '95vh',
+    overflow: 'hidden',
+  },
   title: (theme) => ({
     color: theme.accent,
     textAlign: 'center',

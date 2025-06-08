@@ -28,7 +28,7 @@ export const PerformanceAnalysis = ({ handleCardClick, performance, theme }) => 
   }, [sortedTopics.length]);
 
   return (
-    <>
+    <div style={styles.homePageContainer}>
       <div style={styles.headerContainer}>
         <h2 style={styles.title(theme)}>📊 Performance Analysis</h2>
         <select
@@ -89,6 +89,6 @@ export const PerformanceAnalysis = ({ handleCardClick, performance, theme }) => 
           ))}
         </Slider>
       </div>
-    </>
+    </div>
   );
 };

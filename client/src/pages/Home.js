@@ -1,5 +1,5 @@
 // Home.jsx
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Navbar } from '../components/NavbarManager';
 import axios from 'axios';
@@ -68,6 +68,11 @@ const Home = () => {
   const [incorrectAnswers, setIncorrectAnswers] = useState([]);
   const [topicLoading, setTopicLoading] = useState(false);
 
+  const performanceRef = useRef(null);
+  const pastAttemptsRef = useRef(null);
+  const [activeSection, setActiveSection] = useState('performance');
+
+
   // Fetch user performance when user logs in
   useEffect(() => {
     if (user) {
@@ -85,6 +90,39 @@ const Home = () => {
       fetchPerformance();
     }
   }, [user]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const perfBox = performanceRef.current;
+      const pastBox = pastAttemptsRef.current;
+
+      if (!perfBox || !pastBox) return; // Wait until both are available
+
+      const offset = 90;
+      const perfTop = Math.abs(perfBox.getBoundingClientRect().top - offset);
+      const pastTop = Math.abs(pastBox.getBoundingClientRect().top - offset);
+
+      if (perfTop < pastTop) {
+        setActiveSection('performance');
+      } else {
+        setActiveSection('past');
+      }
+    };
+
+    // Delay initial scroll handler to wait for components to mount
+    const timeout = setTimeout(() => {
+      handleScroll(); // Run once when both sections are likely rendered
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }, 100); // Adjust timing as needed based on your data loading
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+
+
 
   // Handle click on a topic card to show individual topic analysis
   const handleCardClick = async (topic) => {
@@ -133,9 +171,41 @@ const Home = () => {
       <Navbar />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
-        <Typography variant="h3" component="h1" sx={heroStyle}>
-          Welcome Back, {user?.name?.split(' ')[0] ?? 'User'}!
-        </Typography>
+        {!loading &&
+          (performance?.topicAnalysis?.length > 0 ? (
+            <Box display="flex" gap={2} justifyContent="center" mb={2} sx={{
+              position: 'sticky',
+              top: 72,
+              zIndex: 1000,
+              background: darkTheme.background,
+              py: 1,
+              px: 2,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              display: 'flex',
+              justifyContent: 'start',
+              gap: 2,
+            }}>
+              <Button
+                variant={activeSection === 'performance' ? 'contained' : 'outlined'}
+                onClick={() => performanceRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Performance
+              </Button>
+              <Button
+                variant={activeSection === 'past' ? 'contained' : 'outlined'}
+                onClick={() => pastAttemptsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Past Attempts
+              </Button>
+            </Box>
+          ) : (
+            (
+              <Typography variant="h3" component="h1" sx={heroStyle}>
+                Welcome Back, {user?.name?.split(' ')[0] ?? 'User'}!
+              </Typography>
+            )))
+        }
+
 
         {loading ? (
           <Box textAlign="center" mt={6}>
@@ -146,7 +216,10 @@ const Home = () => {
           </Box>
         ) : (
           performance?.topicAnalysis?.length > 0 ? (
-            <>
+            <div
+              ref={performanceRef}
+              style={{ scrollMarginTop: '100px' }}
+              data-id="performance">
               <PerformanceAnalysis
                 handleCardClick={handleCardClick}
                 performance={performance}
@@ -172,7 +245,7 @@ const Home = () => {
                   theme={darkTheme}
                 />
               )}
-            </>
+            </div>
           ) : (
             <div style={{ marginTop: 40 }}>
               <Typography variant="h5" align="center" gutterBottom color={darkTheme.textSecondary}>
@@ -239,7 +312,12 @@ const Home = () => {
           )
         )}
 
-        <PastAttempts userId={user._id} theme={darkTheme} />
+        <div
+          ref={pastAttemptsRef}
+          style={{ scrollMarginTop: '100px' }}
+          data-id="past">
+          <PastAttempts userId={user._id} theme={darkTheme} />
+        </div>
       </div>
     </div>
   );

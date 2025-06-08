@@ -4,7 +4,7 @@ import axios from 'axios';
 import styles from './PastAttemptStyles';
 import AttemptsList from './AttemptsList';
 import AttemptReport from './AttemptReport';
-import {host} from '../../config'
+import { host } from '../../config'
 
 const PastAttempts = ({ userId }) => {
   const [attempts, setAttempts] = useState([]);
@@ -38,7 +38,7 @@ const PastAttempts = ({ userId }) => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.homePageContainer}>
       <h2 style={styles.header}>📚 Past Attempts</h2>
 
       {loading && <div style={styles.loading}>Loading Insights...</div>}
