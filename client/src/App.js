@@ -11,7 +11,8 @@ import { AuthContext } from './context/AuthContext';
 import { ClassProvider } from './context/ClassContext';
 import ClassManager from "./components/ClassManager/ClassManager";
 import JoinClassPage from './pages/JoinClassPage';
-import ClassPage from "./pages/ClassPage"; // <-- Import your new page
+import ClassPage from "./pages/ClassPage";
+import NewUserHomePage from "./pages/NewUserHomePage"; // <-- Import your new page
 
 const NotFound = () => (
   <div style={{
@@ -41,6 +42,7 @@ const App = () => {
           user ? (
             <>
               <Route path='/' element={<Home />} />
+                <Route path='/home' element={<Home />} />
               <Route path='/add-question' element={<QuestionForm />} />
               <Route path='/question-paper' element={<QuestionPaperPage />} />
               <Route path='/admin' element={<AdminPanel />} />
@@ -53,6 +55,7 @@ const App = () => {
             (
               <>
                 {/* If not logged in, redirect all to SyncUser */}
+                <Route path='/' element={<NewUserHomePage/>}/>
                 <Route path='*' element={<SyncUser />} />
               </>
             )

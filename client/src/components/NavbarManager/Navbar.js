@@ -45,7 +45,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" style={styles.logo}>
           <span style={styles.logoIcon}>{appIcon}</span>
-          <span style={styles.logoText}>Question Paper App</span>
+          <span style={styles.logoText}>Hatched</span>
         </Link>
 
         {/* Desktop Links */}
