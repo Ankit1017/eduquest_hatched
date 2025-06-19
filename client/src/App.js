@@ -10,7 +10,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { AuthContext } from './context/AuthContext';
 import { ClassProvider } from './context/ClassContext';
 import ClassManager from "./components/ClassManager/ClassManager";
-import JoinClassPage from './pages/JoinClassPage'; // <-- Import your new page
+import JoinClassPage from './pages/JoinClassPage';
+import ClassPage from "./pages/ClassPage"; // <-- Import your new page
 
 const NotFound = () => (
   <div style={{
@@ -45,6 +46,7 @@ const App = () => {
               <Route path='/admin' element={<AdminPanel />} />
               <Route path="/class" element={<ClassManager />} />
               <Route path="/join/:classId" element={<JoinClassPage />} /> {/* <-- Add this */}
+              <Route path="/class/:classId" element={<ClassPage/>}/>
               <Route path='*' element={<NotFound />} />
             </>
           ) :

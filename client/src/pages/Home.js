@@ -5,10 +5,32 @@ import { Navbar } from '../components/NavbarManager';
 import axios from 'axios';
 import { PerformanceAnalysis } from '../components/PerformanceAnalysisManager';
 import { IndividualTopicAnalysis } from '../components/IndividualTopicAnalysisManager';
-import { CircularProgress, Grid, Paper, Typography, Button, Box } from '@mui/material';
+import {
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  Box,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Chip,
+  Container,
+  Fade,
+  Slide,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import QuizIcon from '@mui/icons-material/Quiz';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TopicIcon from '@mui/icons-material/Topic';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { PastAttempts } from "../components/PastAttemptsManager";
 import { host } from "../config";
 
@@ -19,7 +41,11 @@ const darkTheme = {
   textSecondary: '#90caf9',
   accent: '#64b5f6',
   cardBackground: '#132f4c',
-  border: '1px solid rgba(100, 181, 246, 0.1)'
+  border: '1px solid rgba(100, 181, 246, 0.1)',
+  // Enhanced theme properties
+  accentGradient: 'linear-gradient(45deg, #64b5f6 30%, #42a5f5 70%, #2196f3 90%)',
+  shadow: '0 8px 32px rgba(100, 181, 246, 0.1)',
+  hoverShadow: '0 12px 40px rgba(100, 181, 246, 0.2)'
 };
 
 // --------- HERO SECTION STYLE ---------
@@ -34,7 +60,608 @@ const heroStyle = {
   textShadow: '0 2px 8px rgba(100, 181, 246, 0.2)'
 };
 
-// --------- FEATURE CARDS DATA ---------
+// --------- RESPONSIVE BREAKPOINTS ---------
+const breakpoints = {
+  xs: '(max-width: 600px)',
+  sm: '(max-width: 960px)',
+  md: '(max-width: 1280px)'
+};
+
+// --------- SAMPLE TOPICS WITH ICONS ---------
+const availableTopics = [
+  { name: 'Mathematics', icon: '📊', color: '#ff6b6b' },
+  { name: 'Physics', icon: '⚛️', color: '#4ecdc4' },
+  { name: 'Chemistry', icon: '🧪', color: '#45b7d1' },
+  { name: 'Biology', icon: '🧬', color: '#96ceb4' },
+  { name: 'Computer Science', icon: '💻', color: '#feca57' },
+  { name: 'English', icon: '📚', color: '#ff9ff3' },
+  { name: 'History', icon: '🏛️', color: '#54a0ff' },
+  { name: 'Geography', icon: '🌍', color: '#5f27cd' },
+  { name: 'Economics', icon: '📈', color: '#00d2d3' },
+  { name: 'Psychology', icon: '🧠', color: '#ff6348' }
+];
+
+// --------- TAB PANEL COMPONENT WITH ANIMATION ---------
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Fade in={value === index} timeout={500}>
+          <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            {children}
+          </Box>
+        </Fade>
+      )}
+    </div>
+  );
+}
+
+// --------- ENHANCED NEW USER WELCOME COMPONENT ---------
+const NewUserWelcome = ({ user, theme }) => {
+  const [tabValue, setTabValue] = useState(0);
+  const [selectedTopic, setSelectedTopic] = useState('');
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(breakpoints.xs);
+  const isTablet = useMediaQuery(breakpoints.sm);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const handleTopicSelect = (topic) => {
+    setSelectedTopic(topic);
+  };
+
+  const handleStartTest = () => {
+    if (selectedTopic) {
+      window.location.href = `/question-paper`;
+    } else {
+      alert('Please select a topic first!');
+    }
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4, md: 6 } }}>
+      {/* Hero Section */}
+      <Fade in timeout={800}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6, md: 8 } }}>
+          <Typography
+            variant={isMobile ? "h3" : isTablet ? "h2" : "h1"}
+            component="h1"
+            sx={{
+              background: theme.accentGradient,
+              backgroundClip: 'text',
+              textFillColor: 'transparent',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 800,
+              mb: 2,
+              letterSpacing: '-0.02em'
+            }}
+          >
+            Welcome to Hatched
+          </Typography>
+
+          <Typography
+            variant={isMobile ? "h6" : "h5"}
+            sx={{
+              color: theme.textSecondary,
+              fontWeight: 300,
+              mb: 3,
+              maxWidth: 600,
+              mx: 'auto',
+              lineHeight: 1.6
+            }}
+          >
+            Your AI-Powered Test Performance Platform
+          </Typography>
+
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            mb: 4
+          }}>
+            <Chip
+              label="AI-Powered"
+              sx={{
+                background: theme.accentGradient,
+                color: 'white',
+                fontWeight: 600,
+                px: 1
+              }}
+            />
+            <Chip
+              label="Personalized Learning"
+              sx={{
+                background: theme.cardBackground,
+                color: theme.textPrimary,
+                border: theme.border,
+                fontWeight: 600
+              }}
+            />
+            <Chip
+              label="Performance Tracking"
+              sx={{
+                background: theme.cardBackground,
+                color: theme.textPrimary,
+                border: theme.border,
+                fontWeight: 600
+              }}
+            />
+          </Box>
+        </Box>
+      </Fade>
+
+      {/* Enhanced Tabs Section */}
+      <Slide direction="up" in timeout={1000}>
+        <Paper sx={{
+          background: theme.cardBackground,
+          border: theme.border,
+          borderRadius: { xs: 2, sm: 3 },
+          overflow: 'hidden',
+          backdropFilter: 'blur(10px)',
+          boxShadow: theme.shadow
+        }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            variant={isMobile ? "fullWidth" : "centered"}
+            sx={{
+              borderBottom: `1px solid ${theme.border}`,
+              '& .MuiTab-root': {
+                color: theme.textSecondary,
+                fontWeight: 600,
+                py: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                '&.Mui-selected': {
+                  color: theme.accent,
+                  fontWeight: 700
+                }
+              },
+              '& .MuiTabs-indicator': {
+                height: 3,
+                background: theme.accentGradient
+              }
+            }}
+          >
+            <Tab label="About Hatched" />
+            <Tab label="How It Works" />
+            <Tab label="Get Started" />
+          </Tabs>
+
+          {/* About Hatched Tab */}
+          <TabPanel value={tabValue} index={0}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 4 } }}>
+              <Box sx={{
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
+                background: theme.accentGradient,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 3
+              }}>
+                <SmartToyIcon sx={{ fontSize: { xs: 30, sm: 40 }, color: 'white' }} />
+              </Box>
+
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                sx={{
+                  color: theme.textPrimary,
+                  mb: 3,
+                  fontWeight: 700
+                }}
+              >
+                About Hatched Platform
+              </Typography>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.textSecondary,
+                  lineHeight: 1.8,
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
+                  maxWidth: 800,
+                  mx: 'auto'
+                }}
+              >
+                Hatched is an innovative test preparation platform designed to revolutionize how you improve your academic performance.
+                Our platform combines intelligent testing with AI-powered analysis to create a personalized learning experience that adapts to your unique needs.
+              </Typography>
+            </Box>
+
+            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} wrap="nowrap">
+              {[
+                {
+                  icon: TrendingUpIcon,
+                  title: "Performance Tracking",
+                  description: "Monitor your progress with detailed analytics and performance insights"
+                },
+                {
+                  icon: SmartToyIcon,
+                  title: "AI-Powered Analysis",
+                  description: "Our AI agent analyzes your mistakes and creates personalized improvement strategies"
+                },
+                {
+                  icon: QuizIcon,
+                  title: "Smart Testing",
+                  description: "Take tests across multiple subjects with intelligent question selection"
+                }
+              ].map((feature, index) => {
+                const IconComponent = feature.icon;
+                return (
+                  <Grid item xs={4} key={index}>
+                    <Fade in timeout={1200 + index * 200}>
+                      <Card sx={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: theme.border,
+                        height: '100%',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: theme.hoverShadow,
+                          background: 'rgba(255, 255, 255, 0.08)'
+                        }
+                      }}>
+                        <CardContent sx={{
+                          textAlign: 'center',
+                          p: { xs: 1.5, sm: 2, md: 3 },
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center'
+                        }}>
+                          <Box sx={{
+                            width: { xs: 50, sm: 60 },
+                            height: { xs: 50, sm: 60 },
+                            background: theme.accentGradient,
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mx: 'auto',
+                            mb: 2
+                          }}>
+                            <IconComponent sx={{ fontSize: { xs: 24, sm: 30 }, color: 'white' }} />
+                          </Box>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: theme.textPrimary,
+                              mb: 2,
+                              fontWeight: 600,
+                              fontSize: { xs: '1rem', sm: '1.25rem' }
+                            }}
+                          >
+                            {feature.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: theme.textSecondary,
+                              lineHeight: 1.6,
+                              fontSize: { xs: '0.875rem', sm: '1rem' }
+                            }}
+                          >
+                            {feature.description}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Fade>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+          </TabPanel>
+
+          {/* How It Works Tab */}
+          <TabPanel value={tabValue} index={1}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 5 } }}>
+              <Box sx={{
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
+                background: theme.accentGradient,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 3
+              }}>
+                <AssessmentIcon sx={{ fontSize: { xs: 30, sm: 40 }, color: 'white' }} />
+              </Box>
+
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                sx={{
+                  color: theme.textPrimary,
+                  mb: 3,
+                  fontWeight: 700
+                }}
+              >
+                How Hatched Works
+              </Typography>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.textSecondary,
+                  lineHeight: 1.8,
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
+                  maxWidth: 700,
+                  mx: 'auto'
+                }}
+              >
+                Our AI-powered system continuously learns from your performance to provide personalized test preparation
+              </Typography>
+            </Box>
+
+            <Box sx={{ maxWidth: 900, margin: '0 auto' }}>
+              {[
+                {
+                  step: "1",
+                  title: "Take Your First Test",
+                  description: "Choose a topic and start with our comprehensive question bank",
+                  color: '#ff6b6b'
+                },
+                {
+                  step: "2",
+                  title: "AI Analyzes Your Mistakes",
+                  description: "Our intelligent agent identifies patterns in your incorrect answers and weak areas",
+                  color: '#4ecdc4'
+                },
+                {
+                  step: "3",
+                  title: "Personalized Tomorrow's Paper",
+                  description: "Based on your mistakes, we generate a customized test for the next day focusing on your weak points",
+                  color: '#45b7d1'
+                },
+                {
+                  step: "4",
+                  title: "Continuous Improvement",
+                  description: "The cycle repeats, ensuring constant progress and targeted learning",
+                  color: '#96ceb4'
+                }
+              ].map((item, index) => (
+                <Fade in timeout={1000 + index * 300} key={index}>
+                  <Card sx={{
+                    mb: 3,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: theme.border,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateX(8px)',
+                      boxShadow: theme.hoverShadow
+                    }
+                  }}>
+                    <CardContent sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      p: { xs: 2, sm: 3 },
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      textAlign: { xs: 'center', sm: 'left' }
+                    }}>
+                      <Box sx={{
+                        width: { xs: 50, sm: 60 },
+                        height: { xs: 50, sm: 60 },
+                        background: item.color,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: { xs: 0, sm: 3 },
+                        mb: { xs: 2, sm: 0 },
+                        flexShrink: 0
+                      }}>
+                        <Typography sx={{
+                          color: 'white',
+                          fontWeight: 800,
+                          fontSize: { xs: '1.2rem', sm: '1.4rem' }
+                        }}>
+                          {item.step}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ flex: 1 }}>
+                        <Typography sx={{
+                          color: theme.textPrimary,
+                          fontWeight: 700,
+                          fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                          mb: 1
+                        }}>
+                          {item.title}
+                        </Typography>
+                        <Typography sx={{
+                          color: theme.textSecondary,
+                          lineHeight: 1.6
+                        }}>
+                          {item.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Fade>
+              ))}
+            </Box>
+          </TabPanel>
+
+          {/* Get Started Tab */}
+          <TabPanel value={tabValue} index={2}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 5 } }}>
+              <Box sx={{
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
+                background: theme.accentGradient,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 3
+              }}>
+                <TopicIcon sx={{ fontSize: { xs: 30, sm: 40 }, color: 'white' }} />
+              </Box>
+
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                sx={{
+                  color: theme.textPrimary,
+                  mb: 3,
+                  fontWeight: 700
+                }}
+              >
+                Choose Your First Topic
+              </Typography>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.textSecondary,
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
+                  maxWidth: 600,
+                  mx: 'auto'
+                }}
+              >
+                Select a subject to begin your personalized learning journey with Hatched
+              </Typography>
+            </Box>
+
+            <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 4 }}>
+              {availableTopics.map((topic, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={topic.name}>
+                  <Fade in timeout={1000 + index * 100}>
+                    <Card
+                      sx={{
+                        background: selectedTopic === topic.name
+                          ? theme.accentGradient
+                          : 'rgba(255, 255, 255, 0.05)',
+                        border: selectedTopic === topic.name
+                          ? `2px solid ${theme.accent}`
+                          : theme.border,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        height: '100%',
+                        '&:hover': {
+                          transform: 'translateY(-6px) scale(1.02)',
+                          boxShadow: theme.hoverShadow,
+                          background: selectedTopic === topic.name
+                            ? theme.accentGradient
+                            : 'rgba(255, 255, 255, 0.1)'
+                        }
+                      }}
+                      onClick={() => handleTopicSelect(topic.name)}
+                    >
+                      <CardContent sx={{
+                        textAlign: 'center',
+                        p: { xs: 2, sm: 3 },
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}>
+                        <Typography sx={{
+                          fontSize: { xs: '2rem', sm: '2.5rem' },
+                          mb: 2
+                        }}>
+                          {topic.icon}
+                        </Typography>
+
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: selectedTopic === topic.name ? 'white' : theme.textPrimary,
+                            fontWeight: 700,
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            textAlign: 'center'
+                          }}
+                        >
+                          {topic.name}
+                        </Typography>
+
+                        {selectedTopic === topic.name && (
+                          <CheckCircleIcon sx={{
+                            color: 'white',
+                            mt: 1,
+                            fontSize: { xs: 20, sm: 24 }
+                          }} />
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                </Grid>
+              ))}
+            </Grid>
+
+            {selectedTopic && (
+              <Fade in timeout={500}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: theme.textPrimary,
+                      mb: 3,
+                      fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                  >
+                    Selected Topic: <span style={{
+                      background: theme.accentGradient,
+                      backgroundClip: 'text',
+                      textFillColor: 'transparent',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      fontWeight: 700
+                    }}>
+                      {selectedTopic}
+                    </span>
+                  </Typography>
+
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleStartTest}
+                    endIcon={<ArrowForwardIcon />}
+                    sx={{
+                      px: { xs: 4, sm: 6 },
+                      py: { xs: 1.5, sm: 2 },
+                      fontSize: { xs: '1rem', sm: '1.1rem' },
+                      background: theme.accentGradient,
+                      fontWeight: 700,
+                      borderRadius: 3,
+                      textTransform: 'none',
+                      boxShadow: theme.shadow,
+                      '&:hover': {
+                        transform: 'translateY(-2px) scale(1.05)',
+                        boxShadow: theme.hoverShadow
+                      },
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    Start Your First Test
+                  </Button>
+                </Box>
+              </Fade>
+            )}
+          </TabPanel>
+        </Paper>
+      </Slide>
+    </Container>
+  );
+};
+
+// --------- FEATURE CARDS DATA (KEPT FOR FALLBACK) ---------
 const featureCards = [
   {
     icon: <SchoolIcon sx={{ fontSize: 50, color: darkTheme.accent }} />,
@@ -53,7 +680,7 @@ const featureCards = [
   }
 ];
 
-// --------- MAIN HOME COMPONENT ---------
+// --------- MAIN HOME COMPONENT (UNCHANGED EXISTING LOGIC) ---------
 const Home = () => {
   const { user } = useContext(AuthContext);
 
@@ -71,7 +698,6 @@ const Home = () => {
   const performanceRef = useRef(null);
   const pastAttemptsRef = useRef(null);
   const [activeSection, setActiveSection] = useState('performance');
-
 
   // Fetch user performance when user logs in
   useEffect(() => {
@@ -120,9 +746,6 @@ const Home = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-
-
 
   // Handle click on a topic card to show individual topic analysis
   const handleCardClick = async (topic) => {
@@ -206,7 +829,6 @@ const Home = () => {
             )))
         }
 
-
         {loading ? (
           <Box textAlign="center" mt={6}>
             <CircularProgress size={60} thickness={4} sx={{ color: darkTheme.accent }} />
@@ -247,68 +869,8 @@ const Home = () => {
               )}
             </div>
           ) : (
-            <div style={{ marginTop: 40 }}>
-              <Typography variant="h5" align="center" gutterBottom color={darkTheme.textSecondary}>
-                Get Started with QuizMaster
-              </Typography>
-              <Grid container spacing={4} sx={{ mt: 2, mb: 6 }}>
-                {featureCards.map((card, index) => (
-                  <Grid item xs={12} md={4} key={index}>
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        height: '100%',
-                        textAlign: 'center',
-                        background: darkTheme.cardBackground,
-                        border: darkTheme.border,
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                        '&:hover': {
-                          transform: 'translateY(-5px)',
-                          boxShadow: '0 8px 24px rgba(100, 181, 246, 0.15)'
-                        }
-                      }}
-                    >
-                      {card.icon}
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          mt: 2,
-                          mb: 1,
-                          fontWeight: 600,
-                          color: darkTheme.textPrimary
-                        }}
-                      >
-                        {card.title}
-                      </Typography>
-                      <Typography variant="body1" color={darkTheme.textSecondary}>
-                        {card.text}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-              <Box textAlign="center" mt={4}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  href="/practice"
-                  sx={{
-                    px: 6,
-                    py: 1.5,
-                    fontSize: '1.1rem',
-                    background: `linear-gradient(45deg, ${darkTheme.accent} 30%, #42a5f5 90%)`,
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: `0 4px 12px ${darkTheme.accent}40`
-                    },
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  Start Practicing Now
-                </Button>
-              </Box>
-            </div>
+            // ENHANCED NEW USER WELCOME PAGE REPLACES SIMPLE CARDS
+            <NewUserWelcome user={user} theme={darkTheme} />
           )
         )}
 
