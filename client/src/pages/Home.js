@@ -17,10 +17,6 @@ import {
   Card,
   CardContent,
   Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Container,
   Fade,
   Slide,
@@ -94,7 +90,7 @@ function TabPanel(props) {
   );
 }
 
-// --------- ENHANCED NEW USER WELCOME COMPONENT ---------
+// --------- NEW USER WELCOME COMPONENT (ONLY FOR USERS WITHOUT PERFORMANCE DATA) ---------
 const NewUserWelcome = ({ user, theme }) => {
   const [tabValue, setTabValue] = useState(0);
   const [selectedTopic, setSelectedTopic] = useState('');
@@ -272,68 +268,83 @@ const NewUserWelcome = ({ user, theme }) => {
               </Typography>
             </Box>
 
-            <Grid container spacing={2}>
-                  {[
-                    {
-                      icon: TrendingUpIcon,
-                      title: "Performance Tracking",
-                      description: "Monitor progress with detailed analytics"
-                    },
-                    {
-                      icon: SmartToyIcon,
-                      title: "AI Analysis",
-                      description: "Personalized improvement strategies"
-                    },
-                    {
-                      icon: QuizIcon,
-                      title: "Smart Testing",
-                      description: "Intelligent question selection"
-                    }
-                  ].map((feature, index) => (
-                    <Grid item xs={12} key={index}>
-                      <Box sx={{
+            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+              {[
+                {
+                  icon: TrendingUpIcon,
+                  title: "Performance Tracking",
+                  description: "Monitor your progress with detailed analytics and performance insights"
+                },
+                {
+                  icon: SmartToyIcon,
+                  title: "AI-Powered Analysis",
+                  description: "Our AI agent analyzes your mistakes and creates personalized improvement strategies"
+                },
+                {
+                  icon: QuizIcon,
+                  title: "Smart Testing",
+                  description: "Take tests across multiple subjects with intelligent question selection"
+                }
+              ].map((feature, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Fade in timeout={1200 + index * 200}>
+                    <Card sx={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: theme.border,
+                      height: '100%',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: theme.hoverShadow,
+                        background: 'rgba(255, 255, 255, 0.08)'
+                      }
+                    }}>
+                      <CardContent sx={{
+                        textAlign: 'center',
+                        p: { xs: 2, sm: 3 },
+                        height: '100%',
                         display: 'flex',
-                        alignItems: 'center',
-                        p: 2,
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: 2,
-                        border: theme.border
+                        flexDirection: 'column',
+                        justifyContent: 'center'
                       }}>
                         <Box sx={{
-                          width: 40,
-                          height: 40,
+                          width: 60,
+                          height: 60,
                           background: theme.accentGradient,
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          mr: 2,
-                          flexShrink: 0
+                          mx: 'auto',
+                          mb: 2
                         }}>
-                          <feature.icon sx={{ fontSize: 20, color: 'white' }} />
+                          <feature.icon sx={{ fontSize: 30, color: 'white' }} />
                         </Box>
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              color: theme.textPrimary,
-                              fontWeight: 600,
-                              mb: 0.5
-                            }}
-                          >
-                            {feature.title}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: theme.textSecondary }}
-                          >
-                            {feature.description}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  ))}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: theme.textPrimary,
+                            mb: 2,
+                            fontWeight: 600
+                          }}
+                        >
+                          {feature.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: theme.textSecondary,
+                            lineHeight: 1.6
+                          }}
+                        >
+                          {feature.description}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Fade>
                 </Grid>
+              ))}
+            </Grid>
           </TabPanel>
 
           {/* How It Works Tab */}
@@ -631,7 +642,7 @@ const NewUserWelcome = ({ user, theme }) => {
   );
 };
 
-// --------- MAIN HOME COMPONENT WITH ENHANCED RESPONSIVENESS ---------
+// --------- MAIN HOME COMPONENT ---------
 const Home = () => {
   const { user } = useContext(AuthContext);
   const muiTheme = useTheme();
@@ -652,7 +663,7 @@ const Home = () => {
   const pastAttemptsRef = useRef(null);
   const [activeSection, setActiveSection] = useState('performance');
 
-  // Check if user is new (no performance data)
+  // Check if user is new (no performance data) - FIXED LOGIC
   const isNewUser = !loading && (!performance || !performance.topicAnalysis || performance.topicAnalysis.length === 0);
 
   // Fetch user performance when user logs in
@@ -665,6 +676,7 @@ const Home = () => {
           setPerformance(response.data);
         } catch (err) {
           console.error('Performance fetch error:', err);
+          // Don't set performance to null on error, keep existing logic
         } finally {
           setLoading(false);
         }
@@ -674,7 +686,7 @@ const Home = () => {
   }, [user]);
 
   useEffect(() => {
-    if (isNewUser) return;
+    if (isNewUser) return; // Skip scroll handling for new users
 
     const handleScroll = () => {
       const perfBox = performanceRef.current;
@@ -796,49 +808,32 @@ const Home = () => {
           </Typography>
         </Box>
       ) : isNewUser ? (
+        // Show welcome interface ONLY for new users
         <NewUserWelcome user={user} theme={darkTheme} />
       ) : (
-        <Container maxWidth="xl" sx={{ py: 2 }}>
-          {/* Sticky Navigation for Existing Users */}
-          <Box
-            sx={{
-              position: 'sticky',
-              top: 72,
-              zIndex: 1000,
-              background: darkTheme.background,
-              py: 2,
-              mb: 2,
-              display: 'flex',
-              justifyContent: isMobile ? 'center' : 'flex-start',
-              gap: 2,
-              flexWrap: 'wrap'
-            }}
-          >
+        // Keep EXISTING performance analysis flow for users with data
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+          <Box display="flex" gap={2} justifyContent="center" mb={2} sx={{
+            position: 'sticky',
+            top: 72,
+            zIndex: 1000,
+            background: darkTheme.background,
+            py: 1,
+            px: 2,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+            display: 'flex',
+            justifyContent: 'start',
+            gap: 2,
+          }}>
             <Button
               variant={activeSection === 'performance' ? 'contained' : 'outlined'}
               onClick={() => performanceRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              sx={{
-                borderRadius: 3,
-                px: 3,
-                fontWeight: 600,
-                ...(activeSection === 'performance' && {
-                  background: darkTheme.accentGradient
-                })
-              }}
             >
               Performance
             </Button>
             <Button
               variant={activeSection === 'past' ? 'contained' : 'outlined'}
               onClick={() => pastAttemptsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              sx={{
-                borderRadius: 3,
-                px: 3,
-                fontWeight: 600,
-                ...(activeSection === 'past' && {
-                  background: darkTheme.accentGradient
-                })
-              }}
             >
               Past Attempts
             </Button>
@@ -847,8 +842,7 @@ const Home = () => {
           <div
             ref={performanceRef}
             style={{ scrollMarginTop: '100px' }}
-            data-id="performance"
-          >
+            data-id="performance">
             <PerformanceAnalysis
               handleCardClick={handleCardClick}
               performance={performance}
@@ -856,16 +850,9 @@ const Home = () => {
             />
 
             {topicLoading && (
-              <Box sx={{ textAlign: 'center', my: 4 }}>
-                <CircularProgress
-                  size={40}
-                  thickness={4}
-                  sx={{ color: darkTheme.accent, mb: 2 }}
-                />
-                <Typography
-                  variant="body1"
-                  sx={{ color: darkTheme.textSecondary }}
-                >
+              <Box textAlign="center" mt={4} mb={4}>
+                <CircularProgress size={40} thickness={4} sx={{ color: darkTheme.accent }} />
+                <Typography variant="body1" mt={1} color={darkTheme.textSecondary}>
                   Loading topic data...
                 </Typography>
               </Box>
@@ -886,11 +873,10 @@ const Home = () => {
           <div
             ref={pastAttemptsRef}
             style={{ scrollMarginTop: '100px' }}
-            data-id="past"
-          >
+            data-id="past">
             <PastAttempts userId={user._id} theme={darkTheme} />
           </div>
-        </Container>
+        </div>
       )}
     </Box>
   );
