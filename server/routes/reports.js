@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const TestReport = require('../models/TestReport');
+const reportHelper = require('../helpers/pdfReport');
 
 router.get('/:userId', async (req, res) => {
   try {
@@ -67,6 +68,35 @@ router.get('/:userId/:reportId', async (req, res) => {
     res.status(500).json({
       message: 'Error fetching report details',
       error: error.message
+    });
+  }
+});
+
+
+// Generate PDF report route
+router.post('/generate-pdf/:userId/:reportId', async (req, res) => {
+  try {
+    const { userId, reportId } = req.params;
+    const result = await reportHelper.generateAndUploadReport(userId, reportId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to generate PDF report',
+      details: error.message
+    });
+  }
+});
+
+// Get existing PDF URL route
+router.get('/pdf-url/:userId/:reportId', async (req, res) => {
+  try {
+    const { userId, reportId } = req.params;
+    const result = await reportHelper.getExistingPdfUrl(userId, reportId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to fetch PDF URL',
+      details: error.message
     });
   }
 });

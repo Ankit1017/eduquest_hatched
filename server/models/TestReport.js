@@ -21,7 +21,10 @@ const testReport = new mongoose.Schema({
     name: String,
     correct: Number,
     total: Number
-  }]
+  }],
+  pdfUrl: { type: String }, // S3 URL for generated PDF
+  reportName: { type: String }, // Generated report name
+  motivationalSlogan: { type: String } // Motivational message
 }, { timestamps: true });
 
 

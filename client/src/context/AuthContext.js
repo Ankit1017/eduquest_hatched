@@ -11,65 +11,103 @@ export const AuthProvider = ({ children }) => {
   const { signOut } = useClerk();
   const [appUser, setAppUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(user)
-    const syncUser = async () => {
-      if (user && isLoaded) {
+    const handleUserAuth = async () => {
+      if (!isLoaded) {
         setLoading(true);
-        const role = 'user'; // define or extract user role
-        const classList = []; // your logic here
+        return;
+      }
 
+      if (!user) {
+        // User logged out
+        setAppUser(null);
+        setLoading(false);
+        return;
+      }
+
+      // Check localStorage first
+      const storedUserData = localStorage.getItem('user');
+      const storedUserId = localStorage.getItem('currentUserId');
+
+      // If we have stored data for the same user, use it
+      if (storedUserData && storedUserId === user.id) {
         try {
-          const response = await axios.post(
-            `${host}/api/auth/sync-user`,
-            {
-              id: user.id,
-              email: user.primaryEmailAddress?.emailAddress,
-              name: user.fullName,
-              role,
-              classList
-            },
-            {
-              headers: {
-                Authorization: `Bearer`, // Optional: pass Clerk token if needed
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          console.log('Sync successful:', response.data);
-          setAppUser(response.data.user);
-          console.log(appUser)
-          localStorage.setItem('user', JSON.stringify(response.data));
-        } catch (err) {
-          console.error('Sync failed:', err);
-        } finally {
-          setLoading(false); // DONE loading
+          const parsedUserData = JSON.parse(storedUserData);
+          console.log('Using cached user data');
+          setAppUser(parsedUserData.user);
+          setLoading(false);
+          return;
+        } catch (error) {
+          console.error('Error parsing stored user:', error);
+          // Clear corrupted data and continue to sync
+          localStorage.removeItem('user');
+          localStorage.removeItem('currentUserId');
         }
-      } else {
+      }
+
+      // New user or no cached data - sync with server
+      await syncUser();
+    };
+
+    const syncUser = async () => {
+      setLoading(true);
+      const role = 'user';
+      const classList = [];
+
+      try {
+        console.log('Syncing new user with server...');
+        const response = await axios.post(
+          `${host}/api/auth/sync-user`,
+          {
+            id: user.id,
+            email: user.primaryEmailAddress?.emailAddress,
+            name: user.fullName,
+            role,
+            classList
+          },
+          {
+            headers: {
+              Authorization: `Bearer`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        console.log('Sync successful:', response.data);
+        setAppUser(response.data.user);
+
+        // Cache the user data
+        localStorage.setItem('user', JSON.stringify(response.data));
+        localStorage.setItem('currentUserId', user.id);
+
+      } catch (err) {
+        console.error('Sync failed:', err);
+      } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      syncUser();
-    }
+    handleUserAuth();
   }, [user, isLoaded]);
 
   const login = (data) => {
     setAppUser(data);
     localStorage.setItem('user', JSON.stringify(data));
-    // navigate('/home')
+    localStorage.setItem('currentUserId', data.user?.id || user?.id);
   };
 
   const logout = async () => {
-    await signOut();
-    console.log(user)
-    setAppUser(null);
-    localStorage.removeItem('user');
-    navigate('/')
+    try {
+      await signOut();
+      setAppUser(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('currentUserId');
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (

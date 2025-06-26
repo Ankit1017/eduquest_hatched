@@ -3,5 +3,6 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.9 (common_order_taking)" />
   </component>
-  <component name="KubernetesApiProvider">{}</component>
+  <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (common_order_taking)" project-jdk-type="Python SDK" />
 </project>
