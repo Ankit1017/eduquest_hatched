@@ -1,60 +1,46 @@
-// AttemptsList.jsx
 import React from 'react';
 import styles from './PastAttemptStyles';
+import { format } from 'date-fns';
 
-const AttemptsList = ({ attempts, onSelect, loading }) => (
-  <div>
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString);
+  return format(date, 'd MMM yyyy, h:mm a');
+};
+
+const AttemptsList = ({ attempts, onSelect, loading, isMobile }) => (
+  <div style={styles.cardStack(isMobile)}>
     {attempts.length === 0 && !loading && (
       <div style={{ textAlign: 'center', color: '#666', padding: '32px 0' }}>
         No past attempts found. 📭
       </div>
     )}
 
-    <ul style={{ listStyle: 'none', padding: 0 }}>
-      {attempts.map((attempt) => (
-        <li key={attempt._id}>
-          <div style={styles.attemptCard}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '1.1rem' }}>
-                <span role="img" aria-label="calendar">📅</span>{' '}
-                {new Date(attempt.createdAt || attempt.date).toLocaleString()}
-              </div>
-              <button
-                onClick={() => onSelect(attempt._id)}
-                style={{
-                  background: 'linear-gradient(45deg, #1976d2, #2196f3)',
-                  color: '#fff',
-                  padding: '8px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  transition: 'transform 0.2s',
-                  ':hover': {
-                    transform: 'scale(1.02)'
-                  }
-                }}
-              >
-                View Attempt
-              </button>
-            </div>
-
-            <div style={{ marginTop: '16px', display: 'flex', gap: '24px' }}>
-              <div>
-                <span style={{ color: '#90caf9' }}>Score:</span>{' '}
-                <span style={{ fontWeight: 700 }}>
-                  {attempt.score}/{attempt.total}
-                </span>
-              </div>
-              <div>
-                <span style={{ color: '#90caf9' }}>Time:</span>{' '}
-                {Math.floor(attempt.timeTaken / 60)}m {attempt.timeTaken % 60}s
-              </div>
-            </div>
+    {attempts.map((attempt) => (
+      <div key={attempt._id} style={styles.attemptCard(isMobile)}>
+        <div style={styles.leftCol(isMobile)}>
+          <div style={styles.dateTime(isMobile)}>
+            <span role="img" aria-label="calendar">📅</span>
+            <span>{formatDateTime(attempt.createdAt || attempt.date)}</span>
           </div>
-        </li>
-      ))}
-    </ul>
+          <div style={styles.statsRow(isMobile)}>
+            <span>
+              <span style={styles.score}>Score:</span>{' '}
+              <span style={{ fontWeight: 700 }}>{attempt.score}/{attempt.total}</span>
+            </span>
+            <span>
+              <span style={styles.time}>Time:</span>{' '}
+              {Math.floor(attempt.timeTaken / 60)}m {attempt.timeTaken % 60}s
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => onSelect(attempt._id)}
+          style={styles.viewBtn(isMobile)}
+        >
+          View Attempt
+        </button>
+      </div>
+    ))}
   </div>
 );
 

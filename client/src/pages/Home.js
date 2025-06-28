@@ -796,18 +796,24 @@ const Home = () => {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
         {!loading &&
           (performance?.topicAnalysis?.length > 0 ? (
-            <Box display="flex" gap={2} justifyContent="center" mb={2} sx={{
-              position: 'sticky',
-              top: 72,
-              zIndex: 1000,
-              background: darkTheme.background,
-              py: 1,
-              px: 2,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-              display: 'flex',
-              justifyContent: 'start',
-              gap: 2,
-            }}>
+            <Box
+              display="flex"
+              gap={2}
+              justifyContent="center"
+              mb={2}
+              sx={{
+                position: { xs: 'static', md: 'sticky' },
+                top: { md: 72 },
+                zIndex: { md: 1000 },
+                background: { md: darkTheme.background },
+                py: 1,
+                px: 2,
+                boxShadow: { md: '0 2px 4px rgba(0,0,0,0.05)' },
+                display: 'flex',
+                justifyContent: 'start',
+                gap: 2,
+              }}
+            >
               <Button
                 variant={activeSection === 'performance' ? 'contained' : 'outlined'}
                 onClick={() => performanceRef.current?.scrollIntoView({ behavior: 'smooth' })}

@@ -1,18 +1,25 @@
-// PastAttempts.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './PastAttemptStyles';
 import AttemptsList from './AttemptsList';
 import AttemptReport from './AttemptReport';
-import { host } from '../../config'
+import { host } from '../../config';
 
 const PastAttempts = ({ userId }) => {
   const [attempts, setAttempts] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 600);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (userId) fetchAttempts();
+    // eslint-disable-next-line
   }, [userId]);
 
   const fetchAttempts = async () => {
@@ -38,21 +45,21 @@ const PastAttempts = ({ userId }) => {
   };
 
   return (
-    <div style={styles.homePageContainer}>
-      <h2 style={styles.header}>📚 Past Attempts</h2>
-
-      {loading && <div style={styles.loading}>Loading Insights...</div>}
-
+    <div style={styles.homePageContainer(isMobile)}>
+      <h2 style={styles.header(isMobile)}>📚 Past Attempts</h2>
+      {loading && <div style={styles.loading(isMobile)}>Loading Insights...</div>}
       {!selectedReport ? (
         <AttemptsList
           attempts={attempts}
           onSelect={handleShowReport}
           loading={loading}
+          isMobile={isMobile}
         />
       ) : (
         <AttemptReport
           report={selectedReport}
           onBack={() => setSelectedReport(null)}
+          isMobile={isMobile}
         />
       )}
     </div>

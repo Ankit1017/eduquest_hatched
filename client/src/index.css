@@ -174,9 +174,20 @@ html, body, #root {
 }
 
 
-.card{
-  min-width: 20rem;
+.card {
+  width: 95%;
+  max-width: 340px;
+  margin: 0 auto 16px auto;
+  padding: 12px 6px 10px 6px;
 }
+@media (min-width: 600px) {
+  .card {
+    width: 320px;
+    max-width: 340px;
+    padding: 22px 18px 18px 18px;
+  }
+}
+
 
 .performance_analysis_card{
   transition-duration: 0.3s;

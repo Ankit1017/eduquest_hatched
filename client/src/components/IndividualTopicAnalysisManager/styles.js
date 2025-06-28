@@ -1,6 +1,3 @@
-// styles.js
-// Centralized dark theme style definitions for the IndividualTopicAnalysis module
-
 const darkTheme = {
   overlayBg: 'rgba(10, 25, 41, 0.92)',
   modalBg: '#181b22',
@@ -21,7 +18,6 @@ const darkTheme = {
 
 const styles = {
   overlay: {
-    // Covers the entire viewport with a semi-transparent dark background
     position: 'fixed',
     top: 0, left: 0, right: 0, bottom: 0,
     background: darkTheme.overlayBg,
@@ -31,78 +27,98 @@ const styles = {
     justifyContent: 'center',
     overflowY: 'auto'
   },
-  modal: {
-    // Modal container styling
+  modal: (isMobile) => ({
     background: darkTheme.modalBg,
     borderRadius: '18px',
     boxShadow: darkTheme.shadow,
-    padding: '32px 24px 24px 24px',
-    maxWidth: '1100px',
-    width: '98vw',
-    margin: '40px 0',
+    padding: isMobile ? '10px 4px 16px 4px' : '32px 24px 24px 24px',
+    maxWidth: isMobile ? '98vw' : '1100px',
+    width: isMobile ? '98vw' : '98vw',
+    margin: isMobile ? '8px 0' : '40px 0',
     position: 'relative',
-    border: '1.5px solid #23272f'
-  },
-  closeBtn: {
-    // Close button styling (top-right corner)
-    position: 'absolute',
-    top: 18,
-    right: 24,
+    border: '1.5px solid #23272f',
+    overflowX: 'hidden'
+  }),
+  modalHeader: (isMobile) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: isMobile ? 12 : 30,
+    padding: isMobile ? '4px 4px 0 4px' : '0 0 0 0'
+  }),
+  topicTitle: (isMobile) => ({
+    color: '#1976d2',
+    fontWeight: 700,
+    fontSize: isMobile ? '1.15rem' : '1.5rem',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: isMobile ? '75vw' : 'none'
+  }),
+  closeBtn: (isMobile) => ({
     background: darkTheme.closeBtnBg,
     color: darkTheme.closeBtnText,
     border: 'none',
     borderRadius: '50%',
-    width: 36,
-    height: 36,
-    fontSize: 20,
+    width: isMobile ? 32 : 36,
+    height: isMobile ? 32 : 36,
+    fontSize: isMobile ? 18 : 20,
     fontWeight: 700,
     cursor: 'pointer',
-    transition: 'background 0.2s, color 0.2s'
-  },
-  flexContainer: {
-    // Container for columns (Correct/Incorrect answers)
+    transition: 'background 0.2s, color 0.2s',
+    position: 'static',
+    marginLeft: 10,
+    flexShrink: 0
+  }),
+  flexContainer: (isMobile) => ({
     display: 'flex',
-    gap: '36px',
+    flexDirection: isMobile ? 'column' : 'row',
+    gap: isMobile ? '10px' : '36px',
     justifyContent: 'space-between',
     flexWrap: 'wrap'
-  },
-  column: {
-    // Individual column styling
+  }),
+  column: (isMobile) => ({
     flex: 1,
-    minWidth: 340,
-    maxWidth: 480,
+    minWidth: isMobile ? 'unset' : 340,
+    maxWidth: isMobile ? '100%' : 480,
     background: darkTheme.columnBg,
     borderRadius: '12px',
-    padding: '18px 14px',
-    margin: '12px 0',
+    padding: isMobile ? '10px 4px' : '18px 14px',
+    margin: isMobile ? '6px 0' : '12px 0',
     boxShadow: '0 2px 8px rgba(25,118,210,0.08)',
     overflowY: 'auto',
-    maxHeight: '70vh',
+    maxHeight: isMobile ? 'unset' : '70vh',
     border: '1px solid #23272f'
-  },
-  card: {
-    // Card for each question
+  }),
+  card: (isMobile) => ({
     background: darkTheme.cardBg,
     borderRadius: '10px',
     boxShadow: '0 1px 8px rgba(25,118,210,0.10)',
-    margin: '18px 0',
-    padding: '16px 14px',
+    margin: isMobile ? '10px 0' : '18px 0',
+    padding: isMobile ? '10px 8px' : '16px 14px',
     border: '1px solid #23272f'
-  },
+  }),
   qTitle: { fontWeight: 600, marginBottom: 6, color: '#90caf9' },
-  tag: {
-    // Tag (topic label) styling
+  tagRow: (isMobile) => ({
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: isMobile ? '6px' : '10px',
+    margin: '6px 0 0 0'
+  }),
+  tag: (isMobile) => ({
     display: 'inline-block',
-    padding: '3px 10px',
+    padding: isMobile ? '2px 10px' : '3px 12px',
     background: darkTheme.tagBg,
     color: darkTheme.tagText,
     borderRadius: '12px',
-    fontSize: '0.95em',
-    margin: '2px 8px 2px 0'
-  },
+    fontSize: isMobile ? '0.92em' : '1em',
+    margin: 0,
+    fontWeight: 500,
+    letterSpacing: '0.01em',
+    whiteSpace: 'nowrap',
+  }),
   optionList: { listStyle: 'none', padding: 0, margin: '8px 0' },
   optionItem: {
-    // Base style for each option in the list
     padding: '7px 12px',
     borderRadius: '7px',
     margin: '3px 0',
@@ -115,13 +131,11 @@ const styles = {
     transition: 'background 0.2s, color 0.2s'
   },
   correct: {
-    // Highlight for correct option
     background: darkTheme.correctBg,
     color: darkTheme.correctText,
     border: `1.5px solid ${darkTheme.correctBorder}`
   },
   incorrect: {
-    // Highlight for incorrect selection
     background: darkTheme.incorrectBg,
     color: darkTheme.incorrectText,
     border: `1.5px solid ${darkTheme.incorrectBorder}`
