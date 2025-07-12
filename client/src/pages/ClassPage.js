@@ -291,13 +291,14 @@ function ClassPage() {
         <Box
           sx={{
             flex: 1,
-            ml: isMobile ? 0 : `${drawerWidth}px`,
-            pt: 2,
-            pb: 2,
+            ml: isMobile ? 0 : `${drawerWidth-200}px`,
+            pt: 1,
+            pb: 1,
             px: isMobile ? 1 : 3,
             color: darkTheme.textPrimary,
             bgcolor: darkTheme.background,
             minHeight: "100vh",
+            minWidth: isMobile ? "90vw": "auto",
             marginTop: `${NAVBAR_HEIGHT}px`,
             display: "flex",
             flexDirection: "column",

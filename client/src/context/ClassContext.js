@@ -1,61 +1,85 @@
-// src/context/ClassContext.js
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+/**
+ * ClassContext.js
+ *
+ * Provides global class management state and utilities for the app.
+ * Handles fetching, creation, and joining of classes using the unified API utilities.
+ * Integrates Clerk authentication for secure API calls.
+ */
+
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { host } from '../config';
+import { useClassApi } from '../api'; // Adjust the path if needed
+
 const ClassContext = createContext();
 
+/**
+ * ClassProvider
+ * Wraps children with class management context.
+ * Exposes:
+ *   - classes: Array of user's classes
+ *   - loading: Boolean loading state
+ *   - error: Error message (if any)
+ *   - fetchClasses: Fetches all classes for a user
+ *   - createClass: Creates a new class
+ *   - joinClass: Joins an existing class
+ */
 export const ClassProvider = ({ children }) => {
   const { getToken } = useAuth();
+  const { fetchClasses, createClass, joinClass } = useClassApi();
+
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-// In your useClass context (where fetchClasses is defined), ensure it's memoized:
-const fetchClasses = useCallback(async (userId) => {
-  try {
+  /**
+   * Fetches all classes for a given user.
+   * @param {string} userId - The user's unique ID.
+   */
+  const handleFetchClasses = useCallback(async (userId) => {
     setLoading(true);
-    const token = await getToken();
-    const response = await axios.get(`${host}/api/classes/my`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { user: userId }
-    });
-    setClasses(response.data.classes || []);
-  } catch (err) {
-    setError(err.response?.data?.error || 'Failed to fetch classes');
-  } finally {
-    setLoading(false);
-  }
-}, [getToken]); // Add all dependencies used in the callback
-
-
-
-  const createClass = async (classData) => {
+    setError(null);
     try {
       const token = await getToken();
-      const response = await axios.post(`${host}/api/classes`, classData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setClasses(prev => [...prev, response.data]);
-      return response.data;
+      const data = await fetchClasses(userId, token);
+      setClasses(data);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to fetch classes');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchClasses, getToken]);
+
+  /**
+   * Creates a new class.
+   * @param {object} classData - The class data to create.
+   * @returns {object} The created class data.
+   */
+  const handleCreateClass = async (classData) => {
+    setError(null);
+    try {
+      const token = await getToken();
+      const data = await createClass(classData, token);
+      setClasses(prev => [...prev, data]);
+      return data;
     } catch (err) {
       setError(err.response?.data?.error || 'Class creation failed');
       throw err;
     }
   };
 
-  const joinClass = async (classId,user) => {
+  /**
+   * Joins an existing class.
+   * @param {string} classId - The class ID to join.
+   * @param {object} user - The user object.
+   * @returns {object} The join result.
+   */
+  const handleJoinClass = async (classId, user) => {
+    setError(null);
     try {
       const token = await getToken();
-      const data= {
-        "user":user
-      }
-      const response = await axios.post(`${host}/api/classes/${classId}/join`,
-        { data},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      await fetchClasses();
-      return response.data;
+      const data = await joinClass(classId, user, token);
+      await handleFetchClasses(user._id);
+      return data;
     } catch (err) {
       setError(err.response?.data?.error || 'Enrollment failed');
       throw err;
@@ -63,17 +87,24 @@ const fetchClasses = useCallback(async (userId) => {
   };
 
   return (
-    <ClassContext.Provider value={{
-      classes,
-      loading,
-      error,
-      fetchClasses,
-      createClass,
-      joinClass
-    }}>
+    <ClassContext.Provider
+      value={{
+        classes,
+        loading,
+        error,
+        fetchClasses: handleFetchClasses,
+        createClass: handleCreateClass,
+        joinClass: handleJoinClass,
+      }}
+    >
       {children}
     </ClassContext.Provider>
   );
 };
 
+/**
+ * useClass
+ * Custom hook to access class context.
+ * @returns {object} Class context value.
+ */
 export const useClass = () => useContext(ClassContext);

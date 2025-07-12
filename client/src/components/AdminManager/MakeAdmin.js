@@ -76,7 +76,7 @@ const MakeAdmin = ({ data, fetchUsers }) => {
     }
     setProcessingId(user_id);
     try {
-      const response = await axios.patch("${host}/api/admin/remove-admin", {
+      const response = await axios.patch(`${host}/api/admin/remove-admin`, {
         user_id: user_id,
       });
       toast.success(response.data.message, {

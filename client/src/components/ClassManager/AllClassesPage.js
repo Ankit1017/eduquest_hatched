@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useClass } from "../../context/ClassContext";
 import { AuthContext } from '../../context/AuthContext';
@@ -12,7 +12,6 @@ import {
   Grid,
   Pagination,
   Chip,
-  Avatar,
   Skeleton,
   Container,
   IconButton
@@ -24,7 +23,7 @@ import {
   MoreVert as MoreVertIcon
 } from '@mui/icons-material';
 
-const PAGE_SIZE = 5; // Adjusted for better grid layout
+const PAGE_SIZE = 5;
 
 const darkTheme = {
   background: '#0a1929',
@@ -35,83 +34,94 @@ const darkTheme = {
   border: '1px solid rgba(100, 181, 246, 0.1)'
 };
 
+/**
+ * Renders a loading skeleton grid for class cards.
+ */
+const LoadingSkeleton = () => (
+  <Grid container spacing={3}>
+    {Array.from({ length: 6 }).map((_, index) => (
+      <Grid item xs={12} sm={6} md={4} key={index}>
+        <Card sx={{ background: darkTheme.cardBackground, border: darkTheme.border }}>
+          <CardContent>
+            <Skeleton variant="rectangular" height={120} sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="text" height={32} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="text" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+          </CardContent>
+        </Card>
+      </Grid>
+    ))}
+  </Grid>
+);
+
+/**
+ * Renders an empty state message when no classes are present.
+ */
+const EmptyState = ({ user }) => (
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '400px',
+      textAlign: 'center'
+    }}
+  >
+    <ClassIcon sx={{ fontSize: 80, color: darkTheme.textSecondary, mb: 2 }} />
+    <Typography variant="h5" sx={{ color: darkTheme.textPrimary, mb: 1 }}>
+      No classes found
+    </Typography>
+    <Typography variant="body1" sx={{ color: darkTheme.textSecondary }}>
+      {user?.role === 'teacher' || user?.role === 'admin'
+        ? 'Create your first class to get started'
+        : 'Join a class to see it here'}
+    </Typography>
+  </Box>
+);
+
+/**
+ * Returns a random color from a predefined palette.
+ */
+const getRandomColor = () => {
+  const colors = ['#1976d2', '#388e3c', '#f57c00', '#d32f2f', '#7b1fa2', '#303f9f'];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+/**
+ * AllClassesPage Component
+ * Displays a paginated, responsive list of classes for the current user.
+ * Handles loading, error, and empty states.
+ */
 const AllClassesPage = () => {
   const { classes, loading, error, fetchClasses } = useClass();
-  const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Fetch classes when user changes
   useEffect(() => {
-    let isMounted = true;
-    const controller = new AbortController();
+    if (user?._id) fetchClasses(user._id);
+  }, [user?._id, fetchClasses]);
 
-    if (user?._id) {
-      fetchClasses(user._id);
-    }
+  // Memoize classes array for safety and performance
+  const safeClasses = useMemo(() => Array.isArray(classes) ? classes : [], [classes]);
 
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
-  }, [user?._id]);
-
-  // Ensure classes is always an array
-  const safeClasses = Array.isArray(classes) ? classes : [];
-
-  // Pagination logic
-  const totalPages = Math.ceil(safeClasses.length / PAGE_SIZE);
-  const paginatedClasses = safeClasses.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+  // Pagination calculations
+  const totalPages = useMemo(() => Math.ceil(safeClasses.length / PAGE_SIZE), [safeClasses.length]);
+  const paginatedClasses = useMemo(
+    () => safeClasses.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [safeClasses, currentPage]
   );
 
-  const handlePageChange = (event, page) => {
-    setCurrentPage(page);
-  };
+  /**
+   * Handles page change event for pagination.
+   */
+  const handlePageChange = useCallback((_, page) => setCurrentPage(page), []);
 
-  const getRandomColor = () => {
-    const colors = ['#1976d2', '#388e3c', '#f57c00', '#d32f2f', '#7b1fa2', '#303f9f'];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-
-  const renderLoadingSkeleton = () => (
-    <Grid container spacing={3}>
-      {[...Array(6)].map((_, index) => (
-        <Grid item xs={12} sm={6} md={4} key={index}>
-          <Card sx={{ background: darkTheme.cardBackground, border: darkTheme.border }}>
-            <CardContent>
-              <Skeleton variant="rectangular" height={120} sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton variant="text" height={32} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton variant="text" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
-  );
-
-  const renderEmptyState = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '400px',
-        textAlign: 'center'
-      }}
-    >
-      <ClassIcon sx={{ fontSize: 80, color: darkTheme.textSecondary, mb: 2 }} />
-      <Typography variant="h5" sx={{ color: darkTheme.textPrimary, mb: 1 }}>
-        No classes found
-      </Typography>
-      <Typography variant="body1" sx={{ color: darkTheme.textSecondary }}>
-        {user?.role === 'teacher' || user?.role === 'admin'
-          ? 'Create your first class to get started'
-          : 'Join a class to see it here'}
-      </Typography>
-    </Box>
-  );
+  /**
+   * Handles navigation to class details.
+   */
+  const handleClassClick = useCallback((classId) => navigate(`/class/${classId}`), [navigate]);
 
   return (
     <Box
@@ -123,6 +133,7 @@ const AllClassesPage = () => {
       }}
     >
       <Container maxWidth="lg">
+        {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography
             variant="h4"
@@ -142,6 +153,7 @@ const AllClassesPage = () => {
           </Typography>
         </Box>
 
+        {/* Error Message */}
         {error && (
           <Box sx={{ mb: 3 }}>
             <Typography sx={{ color: '#f44336' }}>
@@ -150,10 +162,11 @@ const AllClassesPage = () => {
           </Box>
         )}
 
+        {/* Loading, Empty, or Classes Grid */}
         {loading ? (
-          renderLoadingSkeleton()
+          <LoadingSkeleton />
         ) : safeClasses.length === 0 ? (
-          renderEmptyState()
+          <EmptyState user={user} />
         ) : (
           <>
             <Grid container spacing={3}>
@@ -174,7 +187,7 @@ const AllClassesPage = () => {
                         boxShadow: '0 8px 24px rgba(100, 181, 246, 0.2)',
                       }
                     }}
-                    onClick={() => navigate(`/class/${cls.classId}`)}
+                    onClick={() => handleClassClick(cls.classId)}
                   >
                     {/* Class Header */}
                     <Box
@@ -190,10 +203,7 @@ const AllClassesPage = () => {
                       <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
                         <IconButton
                           size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle menu options
-                          }}
+                          onClick={e => e.stopPropagation()}
                           sx={{ color: 'white' }}
                         >
                           <MoreVertIcon />
@@ -222,6 +232,7 @@ const AllClassesPage = () => {
                       </Box>
                     </Box>
 
+                    {/* Card Content */}
                     <CardContent sx={{ flexGrow: 1, p: 2 }}>
                       <Typography
                         variant="body2"
@@ -263,12 +274,13 @@ const AllClassesPage = () => {
                       />
                     </CardContent>
 
+                    {/* Card Actions */}
                     <CardActions sx={{ p: 2, pt: 0 }}>
                       <Button
                         size="small"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
-                          navigate(`/class/${cls.classId}`);
+                          handleClassClick(cls.classId);
                         }}
                         sx={{
                           color: darkTheme.accent,
@@ -285,7 +297,7 @@ const AllClassesPage = () => {
               ))}
             </Grid>
 
-            {/* Material-UI Pagination */}
+            {/* Pagination */}
             {totalPages > 1 && (
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 <Pagination

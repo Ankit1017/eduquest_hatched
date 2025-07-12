@@ -7,7 +7,7 @@ import App from './App';
 
 import { ClerkProvider } from '@clerk/clerk-react';
 import AuthProvider from './context/AuthContext';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter} from "react-router-dom";
 
 const root = createRoot(document.getElementById('root'));
 
